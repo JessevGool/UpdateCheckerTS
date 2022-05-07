@@ -2,7 +2,8 @@ import DiscordJS, { Intents } from 'discord.js'
 import dotenv from 'dotenv'
 import WOKCommands from 'wokcommands'
 import path from 'path'
-import { Mod } from './objects/Mod'
+import {Preset} from './objects/Preset'
+import {ApiHandler} from './objects/ApiHandler'
 dotenv.config()
 
 const client = new DiscordJS.Client({
@@ -20,4 +21,8 @@ client.on('ready', () => {
     })
     console.log('Bot is ready')
 })
+
+let preset: Preset = new Preset('Arma_3_Preset_Overthrow_Extra.html');
+let apiHandler: ApiHandler = new ApiHandler();
+apiHandler.requestInfo(preset.modList);
 client.login(process.env.TOKEN)
