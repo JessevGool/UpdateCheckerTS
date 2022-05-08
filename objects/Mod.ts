@@ -19,8 +19,10 @@ export class Mod {
     fileSizeToMB(): string {
         return (this.fileSize / 1000000) + "MB";
     }
-    timeStampToDate(): string {
-        return new Date(this.updateDate).toLocaleDateString();
+    timeStampToDate(): Date {
+        let d = new Date(0);
+        d.setUTCSeconds(this.updateDate);
+        return d;
     }
 }
 

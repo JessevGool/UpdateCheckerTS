@@ -1,6 +1,6 @@
 
 import { Mod } from "./Mod";
-import { database } from "firebase-admin";
+
 export class DatabaseHandler {
     collectionref: any;
     constructor() {

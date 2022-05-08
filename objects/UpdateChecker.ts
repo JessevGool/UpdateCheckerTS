@@ -5,12 +5,13 @@ import { Mod } from './Mod';
 import { Preset } from './Preset';
 const fs = require('fs');
 export class UpdateChecker {
-    presetFolderPath: string = "\\config\\preset";
+    presetFolderPath: string = "/config/preset";
     _client: DiscordJS.Client;
     _apiHandler: ApiHandler;
     _databaseHandler: DatabaseHandler;
     _presetList: Preset[] = [];
     _currentModpack: string[] = [];
+    debugChannel: string = "701548889118998598"; //Set this to the channel you want a message to be sent in
 
 
 
@@ -24,12 +25,13 @@ export class UpdateChecker {
 
     async printDEBUG(message: string) {
         console.log(message);
-        (this._client.channels.cache.get("701548889118998598") as TextChannel).send(message);
+        
+        (this._client.channels.cache.get(this.debugChannel) as TextChannel).send(message);
     }
 
 
     async printDEBUGEMBED(message: MessageEmbed) {
-        (this._client.channels.cache.get("701548889118998598") as TextChannel).send({ embeds: [message] });
+        (this._client.channels.cache.get(this.debugChannel) as TextChannel).send({ embeds: [message] });
     }
 
     getPresets(presetFolderPath: string) {
@@ -142,11 +144,12 @@ export class UpdateChecker {
 
     }
     createModEmbed(mod: Mod) {
+        console.log(mod.updateDate)
         const embed: MessageEmbed = new MessageEmbed()
         embed.setTitle(mod.name + " has been updated");
         embed.setColor('#63031b')
         embed.addField("Filesize", mod.fileSizeToMB(), false);
-        embed.addField("Update Time", mod.timeStampToDate(), false)
+        embed.addField("Update Time", mod.timeStampToDate().toDateString(), false)
         embed.addField("Mod ID", mod.id.toString(), false)
         embed.setURL(`https://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id}`)
         embed.setTimestamp(Date.now())
