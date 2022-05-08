@@ -17,7 +17,6 @@ export class ApiHandler {
             const chunk = _modList.splice(0, 20);
             split.push(chunk);
             if (firstSplit) {
-                console.log("Modlist was higher than 20, splitting into chunks");
                 firstSplit = false;
             }
 

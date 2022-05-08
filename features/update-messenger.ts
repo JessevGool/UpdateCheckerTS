@@ -3,12 +3,11 @@ import { UpdateChecker } from "../objects/UpdateChecker";
 
 export default (client: Client)=>{
     const checker = new UpdateChecker(client);
-    const sleepTime = 1000*30;
+    const sleepTime = 1000*60*15;
     const checkForUpdates = () =>{
-        console.log("Checking for updates...");
         
         checker.checkforModpackUpdates();
-        console.log("Done checking for updates.");
+        console.log("Last update: " + new Date().toLocaleString());
         console.log("Sleeping for " + sleepTime/1000/60 + " minutes...");
         setTimeout(checkForUpdates,sleepTime);
     }

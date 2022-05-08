@@ -133,7 +133,6 @@ export class UpdateChecker {
 
                     if (updated) {
                         this._databaseHandler.updateModInCollection(mod)
-                        console.log(mod.id + " has updated")
                         this.printDEBUGEMBED(this.createModEmbed(mod))
                     }
 
@@ -144,16 +143,16 @@ export class UpdateChecker {
 
     }
     createModEmbed(mod: Mod) {
-        console.log(mod.updateDate)
+        
         const embed: MessageEmbed = new MessageEmbed()
         embed.setTitle(mod.name + " has been updated");
         embed.setColor('#63031b')
         embed.addField("Filesize", mod.fileSizeToMB(), false);
-        embed.addField("Update Time", mod.timeStampToDate().toDateString(), false)
+        embed.addField("Update Time", mod.timeStampToDate().toLocaleString(), false)
         embed.addField("Mod ID", mod.id.toString(), false)
         embed.setURL(`https://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id}`)
         embed.setTimestamp(Date.now())
-        console.log(`MOD ${mod.name} has been updated\nID: ${mod.id}`)
+        console.log(`MOD ${mod.name} has been updated\nID: ${mod.id}\nTime: ${mod.timeStampToDate().toLocaleString()}`)
         return embed
     }
 
