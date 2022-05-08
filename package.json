@@ -15,6 +15,7 @@
     "beautiful-dom": "^1.0.9",
     "discord.js": "^13.6.0",
     "dotenv": "^16.0.0",
+    "firebase-admin": "^10.2.0",
     "form-data": "^4.0.0",
     "needle": "^3.1.0",
     "node-fetch": "^2.6.7",
