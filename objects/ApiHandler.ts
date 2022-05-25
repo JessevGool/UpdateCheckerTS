@@ -5,11 +5,11 @@ export class ApiHandler {
         console.log("ApiHandler created");
     }
 
-    async requestInfo(modList: string[]): Promise<Mod[]> {
+    async requestInfo(modList: string[], retries: number = 0): Promise<Mod[]> {
 
         let _modList: string[] = [];
+        modList.push("2558613372");
         _modList = _modList.concat(modList)
-        _modList.push("2558613372");
         let split = [];
         let gatherModInfo: Mod[] = [];
         let firstSplit = true;
@@ -39,17 +39,29 @@ export class ApiHandler {
                 },
                 data: data
             };
-            const promise = await axios(config).then((response: any) => response.data)
-                .catch(function (error: any) {
-                    console.log(error.toJSON());
+            try {
+                const promise = await axios(config).then((response: any) => response.data)
+                    .catch(function (error: any) {
+                        console.log(error.toJSON());
+                    });
+                let modlist = promise.response.publishedfiledetails;
+
+                modlist.forEach((mod: any) => {
+                    gatherModInfo.push(this.jsonToMod(mod));
                 });
-            let modlist = promise.response.publishedfiledetails;
 
-            modlist.forEach((mod: any) => {
-                gatherModInfo.push(this.jsonToMod(mod));
-            });
+                delay(5000);
+            } catch (error) {
+                if (retries <= 5) {
+                    retries++;
+                    this.requestInfo(modList, retries);
+                }
+                else {
+                    console.log(error);
+                    return [];
+                }
 
-            delay(5000);
+            }
         };
 
         return gatherModInfo;

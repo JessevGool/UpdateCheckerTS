@@ -12,7 +12,7 @@ export class UpdateChecker {
     _presetList: Preset[] = [];
     _currentModpack: string[] = [];
     debugChannel: string = "701548889118998598"; //Set this to the channel you want a message to be sent in
-
+    coalitionChannel: string = "468879945293234177";
 
 
     constructor(client: DiscordJS.Client) {
@@ -25,12 +25,14 @@ export class UpdateChecker {
 
     async printDEBUG(message: string) {
         console.log(message);
-        
+
+        //(this._client.channels.cache.get(this.coalitionChannel) as TextChannel).send(message);
         (this._client.channels.cache.get(this.debugChannel) as TextChannel).send(message);
     }
 
 
     async printDEBUGEMBED(message: MessageEmbed) {
+        (this._client.channels.cache.get(this.coalitionChannel) as TextChannel).send({ embeds: [message] });
         (this._client.channels.cache.get(this.debugChannel) as TextChannel).send({ embeds: [message] });
     }
 
@@ -79,7 +81,7 @@ export class UpdateChecker {
                 this._presetList.push(newPreset);
                 newPreset.modList.forEach(mod => {
                     this._currentModpack.push(mod)
-                    
+
                     this._currentModpack = this._currentModpack.filter(function (elem, index, self) {
                         return index === self.indexOf(elem);
                     })
@@ -112,6 +114,7 @@ export class UpdateChecker {
     }
 
     async checkIfModHasUpdated(databaseMods: Mod[], steamAPIMods: Mod[]) {
+        let updateSize = 0;
         databaseMods.forEach(mod => {
             steamAPIMods.forEach(steamMod => {
                 if (mod.id == steamMod.id) {
@@ -119,21 +122,33 @@ export class UpdateChecker {
                     if (mod.updateDate != steamMod.updateDate) {
                         mod.updateDate = steamMod.updateDate
                         updated = true
+                        if (mod.fileSize != steamMod.fileSize) {
+                            if (steamMod.fileSize != 0) {
+                                mod.fileSize = steamMod.fileSize;
+                                updateSize = steamMod.fileSize - mod.fileSize;
+                            }
+                            else {
+                                this.printDEBUG(`------\n
+                                MOD ${mod.name} has been updated\n
+                                ID: ${mod.id}\n
+                                Time: ${mod.timeStampToDate().toLocaleString()}\n
+                                Size was 0\n
+                                ------`)
+                                updateSize = 0;
+                                updated = false;
+                            }
+                        }
+
+                        if (mod.name != steamMod.name) {
+                            mod.name = steamMod.name
+                        }
+
                     }
 
-                    if (mod.fileSize != steamMod.fileSize) {
-                        mod.fileSize = steamMod.fileSize
-                        updated = true
-                    }
-
-                    if (mod.name != steamMod.name) {
-                        mod.name = steamMod.name
-                        updated = true
-                    }
 
                     if (updated) {
                         this._databaseHandler.updateModInCollection(mod)
-                        this.printDEBUGEMBED(this.createModEmbed(mod))
+                        this.printDEBUGEMBED(this.createModEmbed(mod, updateSize))
                     }
 
                 }
@@ -142,18 +157,52 @@ export class UpdateChecker {
         });
 
     }
-    createModEmbed(mod: Mod) {
-        
+    createModEmbed(mod: Mod, updatesize: number) {
+
         const embed: MessageEmbed = new MessageEmbed()
         embed.setTitle(mod.name + " has been updated");
         embed.setColor('#63031b')
-        embed.addField("Filesize", mod.fileSizeToMB(), false);
-        embed.addField("Update Time", mod.timeStampToDate().toLocaleString(), false)
+        embed.addField("Updatesize", this.fileSizeToString(updatesize), false);
+        embed.addField("Update Time", `<t:${mod.updateDate}:f>`, false)
         embed.addField("Mod ID", mod.id.toString(), false)
         embed.setURL(`https://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id}`)
         embed.setTimestamp(Date.now())
-        console.log(`MOD ${mod.name} has been updated\nID: ${mod.id}\nTime: ${mod.timeStampToDate().toLocaleString()}`)
+        console.log(`------\n
+        MOD ${mod.name} has been updated\n
+        ID: ${mod.id}\n
+        Time: ${mod.timeStampToDate().toLocaleString()}\n
+        ------`)
         return embed
+    }
+    fileSizeToString(updateSize: number): string {
+        //UGLY BUT IDC
+        if (updateSize > 1) {
+            if (updateSize / 1000000000 > 1) {
+                return (updateSize / 10000000) + "GB";
+            }
+            else
+                if (updateSize / 1000000 > 0.1) {
+                    return (updateSize / 1000000) + "MB";
+
+                }
+                else {
+                    return (updateSize / 1000) + "KB"
+                }
+        }
+        else {
+            if (updateSize / 1000000000 < -1) {
+                return (updateSize / 10000000) + "GB";
+            }
+            else
+                if (updateSize / 1000000 < -0.1) {
+                    return (updateSize / 1000000) + "MB";
+
+                }
+                else {
+                    return (updateSize / 1000) + "KB"
+                }
+        }
+
     }
 
 }
