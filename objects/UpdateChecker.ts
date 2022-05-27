@@ -115,6 +115,7 @@ export class UpdateChecker {
 
     async checkIfModHasUpdated(databaseMods: Mod[], steamAPIMods: Mod[]) {
         let updateSize = 0;
+        let _errors = 0;
         databaseMods.forEach(mod => {
             steamAPIMods.forEach(steamMod => {
                 if (mod.id == steamMod.id) {
@@ -133,7 +134,8 @@ export class UpdateChecker {
                                 ID: ${mod.id}\n
                                 Time: ${mod.timeStampToDate().toLocaleString()}\n
                                 Size was 0\n
-                                ------`)
+                                ------`);
+                                _errors+=1;
                                 updateSize = 0;
                                 updated = false;
                             }
@@ -146,7 +148,7 @@ export class UpdateChecker {
                     }
 
 
-                    if (updated) {
+                    if (updated && _errors == 0) {
                         this._databaseHandler.updateModInCollection(mod)
                         this.printDEBUGEMBED(this.createModEmbed(mod, updateSize))
                     }
