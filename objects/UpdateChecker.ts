@@ -117,7 +117,7 @@ export class UpdateChecker {
         let updateSize = 0;
         let _errors = 0;
         databaseMods.forEach(mod => {
-            steamAPIMods.forEach(steamMod => {
+            steamAPIMods.forEach(async steamMod => {
                 if (mod.id == steamMod.id) {
                     let updated = false
                     if (mod.updateDate != steamMod.updateDate) {
@@ -151,6 +151,27 @@ export class UpdateChecker {
                     if (updated && _errors == 0) {
                         this._databaseHandler.updateModInCollection(mod)
                         this.printDEBUGEMBED(this.createModEmbed(mod, updateSize))
+                        let updatedMods = await this._databaseHandler.getUpdateList();
+                        let containsMod = false;
+                        updatedMods.forEach(_mod => {
+                            if(_mod.id == mod.id )
+                            {
+                                containsMod = true;
+                                _mod.updateDate = mod.updateDate
+                                _mod.fileSize = mod.fileSize
+                                _mod.name = mod.name
+                            }
+                        });
+                        if(!containsMod)
+                        {
+                            this._databaseHandler.addModToUpdatedList(mod);
+                            this.printDEBUG("Added mod to updated list");
+                        }
+                        else
+                        {
+                            this._databaseHandler.updateModInUpdatedList(mod);
+                            this.printDEBUG("Updated mod in updated list");   
+                        }
                     }
 
                 }
