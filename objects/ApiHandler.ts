@@ -42,7 +42,7 @@ export class ApiHandler {
             try {
                 const promise = await axios(config).then((response: any) => response.data)
                     .catch(function (error: any) {
-                        console.log(error.toJSON());
+                        console.log("Error with Code: "+error.code+" occured");
                     });
                 let modlist = promise.response.publishedfiledetails;
 

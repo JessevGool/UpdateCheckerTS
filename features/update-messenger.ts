@@ -4,6 +4,7 @@ import { UpdateChecker } from "../objects/UpdateChecker";
 export default (client: Client)=>{
     const checker = new UpdateChecker(client);
     const sleepTime = 1000*60*15;
+    checker.setInitialStatus();
     const checkForUpdates = () =>{
         
         checker.checkforModpackUpdates();

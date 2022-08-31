@@ -4,6 +4,7 @@ import { Mod } from "./Mod";
 export class DatabaseHandler {
     collectionref: any;
     updateref: any;
+    totalSize: any;
     constructor() {
         var admin = require("firebase-admin");
 
@@ -17,6 +18,7 @@ export class DatabaseHandler {
         let database = admin.database();
         this.collectionref = database.ref("/ModCollection");
         this.updateref = database.ref("/UpdatedMods");
+        this.totalSize = database.ref("/TotalSize");
         console.log("DatabaseHandler initialized");
 
     }
@@ -43,6 +45,11 @@ export class DatabaseHandler {
             );
         });
     }
+    resetTotalSize() {
+        this.totalSize.child("totalSize").set({
+            'size': 0
+        });
+    }
 
     addModToCollection(mod: Mod) {
         this.collectionref.child(mod.id).set(
@@ -61,6 +68,21 @@ export class DatabaseHandler {
                 'fileSize': mod.fileSize,
                 'postDate': mod.postDate,
                 'updateDate': mod.updateDate
+            }
+        );
+    }
+    async getTotalSize(): Promise<number> {
+        let totalSize = await this.totalSize.once("value")
+        totalSize = totalSize.val();
+        for (const key in totalSize) {
+            totalSize = totalSize[key].size;
+        }
+        return totalSize;
+    }
+    updateTotalSize(size: number) {
+        this.totalSize.child("totalSize").set(
+            {
+                'size': size
             }
         );
     }

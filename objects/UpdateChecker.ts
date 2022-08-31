@@ -22,12 +22,26 @@ export class UpdateChecker {
         this._presetList = this.getPresets(this.presetFolderPath)
         this._currentModpack = this.setInitialModPackToCheck();
     }
-
+    async setInitialStatus() {
+        let totalSize = await this._databaseHandler.getTotalSize();
+        if (totalSize != null) {
+            let totalSizeConverted = this.fileSizeToString(totalSize);
+            this._client.user?.setPresence({
+                status: 'dnd',
+                activities: [
+                    {
+                        name: `Detected ${totalSizeConverted} worth of updates`
+                    }
+                ]
+            })
+        }
+    }
     async printDEBUG(message: string) {
         console.log(message);
 
         //(this._client.channels.cache.get(this.coalitionChannel) as TextChannel).send(message);
-        (this._client.channels.cache.get(this.debugChannel) as TextChannel).send(message);
+        await (this._client.channels.cache.get(this.debugChannel) as TextChannel).send(message)
+
     }
 
 
@@ -124,9 +138,13 @@ export class UpdateChecker {
                         mod.updateDate = steamMod.updateDate
                         updated = true
                         if (mod.fileSize != steamMod.fileSize) {
+                            console.log(steamMod.fileSize)
                             if (steamMod.fileSize != 0) {
-                                mod.fileSize = steamMod.fileSize;
                                 updateSize = steamMod.fileSize - mod.fileSize;
+                                console.log("---------");
+                                console.log("SteamMod: " + steamMod.fileSize + "\nMod: " + mod.fileSize);
+                                console.log("---------");
+                                mod.fileSize = steamMod.fileSize;
                             }
                             else {
                                 this.printDEBUG(`------\n
@@ -135,7 +153,7 @@ export class UpdateChecker {
                                 Time: ${mod.timeStampToDate().toLocaleString()}\n
                                 Size was 0\n
                                 ------`);
-                                _errors+=1;
+                                _errors += 1;
                                 updateSize = 0;
                                 updated = false;
                             }
@@ -151,26 +169,37 @@ export class UpdateChecker {
                     if (updated && _errors == 0) {
                         this._databaseHandler.updateModInCollection(mod)
                         this.printDEBUGEMBED(this.createModEmbed(mod, updateSize))
+                        let totalSize = await this._databaseHandler.getTotalSize();
+                        if (totalSize != null) {
+                            totalSize += updateSize;
+                            this._databaseHandler.updateTotalSize(totalSize);
+                            let totalSizeConverted = this.fileSizeToString(totalSize);
+                            this._client.user?.setPresence({
+                                status: 'dnd',
+                                activities: [
+                                    {
+                                        name: `Detected ${totalSizeConverted} worth of updates.`
+                                    }
+                                ]
+                            })
+                        }
                         let updatedMods = await this._databaseHandler.getUpdateList();
                         let containsMod = false;
                         updatedMods.forEach(_mod => {
-                            if(_mod.id == mod.id )
-                            {
+                            if (_mod.id == mod.id) {
                                 containsMod = true;
                                 _mod.updateDate = mod.updateDate
                                 _mod.fileSize = mod.fileSize
                                 _mod.name = mod.name
                             }
                         });
-                        if(!containsMod)
-                        {
+                        if (!containsMod) {
                             this._databaseHandler.addModToUpdatedList(mod);
                             this.printDEBUG("Added mod to updated list");
                         }
-                        else
-                        {
+                        else {
                             this._databaseHandler.updateModInUpdatedList(mod);
-                            this.printDEBUG("Updated mod in updated list");   
+                            this.printDEBUG("Updated mod in updated list");
                         }
                     }
 
@@ -201,28 +230,29 @@ export class UpdateChecker {
         //UGLY BUT IDC
         if (updateSize > 1) {
             if (updateSize / 1000000000 > 1) {
-                return (updateSize / 10000000) + "GB";
+
+                return Math.round((updateSize / 1000000000) * 100) / 100 + "GB";
             }
             else
                 if (updateSize / 1000000 > 0.1) {
-                    return (updateSize / 1000000) + "MB";
+                    return Math.round((updateSize / 1000000) * 100) / 100 + "MB";
 
                 }
                 else {
-                    return (updateSize / 1000) + "KB"
+                    return Math.round((updateSize / 1000) * 100) / 100 + "KB"
                 }
         }
         else {
             if (updateSize / 1000000000 < -1) {
-                return (updateSize / 10000000) + "GB";
+                return Math.round((updateSize / 1000000000) * 100) / 100 + "GB";
             }
             else
                 if (updateSize / 1000000 < -0.1) {
-                    return (updateSize / 1000000) + "MB";
+                    return Math.round((updateSize / 1000000) * 100) / 100 + "MB";
 
                 }
                 else {
-                    return (updateSize / 1000) + "KB"
+                    return Math.round((updateSize / 1000) * 100) / 100 + "KB"
                 }
         }
 

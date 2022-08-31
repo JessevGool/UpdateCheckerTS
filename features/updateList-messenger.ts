@@ -2,15 +2,15 @@ import { Client, MessageEmbed, TextChannel } from "discord.js";
 import { DatabaseHandler } from "../objects/DatabaseHandler";
 
 export default (client: Client) => {
-    const sleepTime = 1000 * 60 * 1;
+    const sleepTime = 1000 * 60 * 15;
     const dbHandler = new DatabaseHandler();
     let debugChannel: string = "701548889118998598"; //Set this to the channel you want a message to be sent in
     let coalitionChannel: string = "468879945293234177";
     let sentBool = false;
     const checkForUpdates = async () => {
         const now = new Date();
-        if (now.getUTCDay() == 4 || now.getUTCDay() == 6) {
-            if ((now.getUTCHours() == 22 && now.getDay() == 3) || (now.getUTCHours() == 20 && now.getUTCDay() == 6)) {
+        if (now.getUTCDay() == 3 || now.getUTCDay() == 6) {
+            if ((now.getUTCHours() == 22 && now.getUTCDay() == 3) || (now.getUTCHours() == 20 && now.getUTCDay() == 6)) {
                 if (!sentBool) {
                     console.log("Checking for updates");
                     sentBool = true;
@@ -27,7 +27,7 @@ export default (client: Client) => {
                     }
                    
                     const embed: MessageEmbed = new MessageEmbed()
-                    embed.setTitle("Mod Updated since last session");
+                    embed.setTitle("Mod Updates since last session");
                     embed.setColor('#63031b');
                     embed.addField("Updated Mods", updateString, false);
                     embed.setTimestamp(Date.now());
