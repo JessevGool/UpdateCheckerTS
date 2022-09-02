@@ -35,4 +35,18 @@ export class Preset {
         });
         return modList;
     }
+    getModNames(): string[] {
+        let modList: string[] = [];
+        let preset = fs.readFileSync(defaultPath + this.fileName).toString();
+        const dom = new BeautifulDom(preset);
+        let modNodes = dom.querySelectorAll('td');
+        modNodes.forEach(node => {
+            if(node.getAttribute('data-type') == 'DisplayName')
+            {
+                modList.push(node.innerText);
+            }
+        });
+        return modList;
+    }
+    
 }

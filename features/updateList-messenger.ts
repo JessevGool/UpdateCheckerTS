@@ -30,6 +30,7 @@ export default (client: Client) => {
                     embed.setTitle("Mod Updates since last session");
                     embed.setColor('#63031b');
                     embed.addField("Updated Mods", updateString, false);
+                    embed.setFooter({text:`Automated Task`});
                     embed.setTimestamp(Date.now());
                     (client.channels.cache.get(debugChannel) as TextChannel).send({ embeds: [embed] });
                     (client.channels.cache.get(coalitionChannel) as TextChannel).send({ embeds: [embed] });
