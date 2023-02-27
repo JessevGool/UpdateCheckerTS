@@ -1,6 +1,7 @@
 import { Client, MessageEmbed, TextChannel } from "discord.js";
 import { DatabaseHandler } from "../objects/DatabaseHandler";
 
+
 export default (client: Client) => {
     const sleepTime = 1000 * 60 * 15;
     const dbHandler = new DatabaseHandler();
@@ -17,8 +18,8 @@ export default (client: Client) => {
                     let updatedModList = await dbHandler.getUpdateList();
                     let updateString = "";
                     if (updatedModList.length > 0) {
-
                         updatedModList.forEach(mod => {
+                           
                             updateString += `${mod.name} - ${mod.id}\n`
                         });
                     }

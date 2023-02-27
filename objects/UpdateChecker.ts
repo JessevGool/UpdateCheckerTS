@@ -158,7 +158,15 @@ export class UpdateChecker {
                                 updated = false;
                             }
                         }
-
+                        if (mod.name == undefined || mod.id ==undefined || mod.fileSize == undefined || mod.postDate == undefined || mod.updateDate == undefined) {
+                            console.log(" error");
+                            console.log(mod.name)
+                            console.log(mod.id)
+                            console.log(mod.fileSize)
+                            console.log(mod.postDate)
+                            console.log(mod.updateDate)
+                            _errors += 1;
+                        }
                         if (mod.name != steamMod.name) {
                             mod.name = steamMod.name
                         }
@@ -210,13 +218,24 @@ export class UpdateChecker {
 
     }
     createModEmbed(mod: Mod, updatesize: number) {
-
+        let packString = "";
+        this._presetList.forEach(preset => {
+            if(preset.getModList().includes(mod.id.toString()))
+            {
+                if(packString.length > 0)
+                {
+                    packString += "\n";
+                }
+                packString += preset.fileName;
+            }
+        });
         const embed: MessageEmbed = new MessageEmbed()
         embed.setTitle(mod.name + " has been updated");
         embed.setColor('#63031b')
         embed.addField("Updatesize", this.fileSizeToString(updatesize), false);
         embed.addField("Update Time", `<t:${mod.updateDate}:f>`, false)
         embed.addField("Mod ID", mod.id.toString(), false)
+        embed.addField("Pack(s)",packString,false)
         embed.setURL(`https://steamcommunity.com/sharedfiles/filedetails/?id=${mod.id}`)
         embed.setTimestamp(Date.now())
         console.log(`------\n

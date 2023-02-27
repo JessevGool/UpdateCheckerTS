@@ -16,6 +16,7 @@ client.on('ready', () => {
     new WOKCommands(client, {
         commandsDir: path.join(__dirname, 'commands'),
         featuresDir: path.join(__dirname, 'features'),
+        mongoUri: process.env.MONGO_URI || '',
         typeScript: true,
         testServers: '535921542198984727',
         botOwners: ["110099583786328064"]
@@ -25,4 +26,5 @@ client.on('ready', () => {
 
 
 client.login(process.env.TOKEN)
+
 

@@ -17,6 +17,9 @@ export default {
                 mods.push(mod);
             });
         });
+        mods = mods.filter(function (elem, index, self) {
+            return index === self.indexOf(elem);
+        })
         if (mods.length > 0) {
             let modString = "";
             let secondaryString = "";
