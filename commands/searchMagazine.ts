@@ -7,17 +7,19 @@ export default {
     slash: 'both',                      // Can be 'both', true, false
     testOnly: false,
     minArgs: 1,
-    ephemeral: true,
     expectedArgs: '<magazinecaliber>',
     permissions: ["MANAGE_MESSAGES"],
-
+    /**
+     * 
+     * [ configFile >> "CfgMagazines" ] call BIS_fnc_exportConfigHierarchy;
+     *  
+     */
     callback: async ({ client, interaction,text }) => {
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ ephemeral: false });
         let parser = new FileParser();
         let entries = parser.findMagazine(text);
         let magazineString = "";
         let classNameString = "";
-        let embeds : MessageEmbed[] = [];
         if (entries.size > 0) {
             entries.forEach((value, key) => {
                 magazineString += `${key}\n`;
@@ -33,7 +35,8 @@ export default {
         }
         if(neededMessages > 1)
         {
-            return "Too many results, please be more specific";
+            let resultAmount = magazineString.split("\n").length;
+            interaction.editReply(`Too many results: ${resultAmount}, please be more specific`);
         }
         else
         {
