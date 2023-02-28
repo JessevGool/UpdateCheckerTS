@@ -8,7 +8,6 @@ export default {
     testOnly: false,
     minArgs: 1,
     expectedArgs: '<magazinecaliber>',
-    permissions: ["MANAGE_MESSAGES"],
     /**
      * 
      * [ configFile >> "CfgMagazines" ] call BIS_fnc_exportConfigHierarchy;
@@ -27,6 +26,7 @@ export default {
         })}
         else {
             magazineString = "No magazines found";
+            classNameString = "Read the message to the left";
         }
         let neededMessages = Math.ceil(magazineString.length / 1024);
         if(Math.ceil(classNameString.length / 1024) > neededMessages)
