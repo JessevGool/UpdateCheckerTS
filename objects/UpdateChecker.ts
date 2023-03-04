@@ -13,6 +13,7 @@ export class UpdateChecker {
     _currentModpack: string[] = [];
     debugChannel: string = "701548889118998598"; //Set this to the channel you want a message to be sent in
     coalitionChannel: string = "468879945293234177";
+    modpackChannel: string = "438868482273181698";
 
 
     constructor(client: DiscordJS.Client) {
@@ -45,7 +46,12 @@ export class UpdateChecker {
     }
 
 
-    async printDEBUGEMBED(message: MessageEmbed) {
+    async printDEBUGEMBED(message: MessageEmbed, updateSize: number, mod: Mod) {
+        if(updateSize / 1000000 < 0.1 && (mod.name.toLocaleLowerCase().includes("coaltion") || mod.name.toLowerCase().includes("cco")))
+        {
+            (this._client.channels.cache.get(this.modpackChannel) as TextChannel).send({ embeds: [message] });
+            return
+        }
         (this._client.channels.cache.get(this.coalitionChannel) as TextChannel).send({ embeds: [message] });
         (this._client.channels.cache.get(this.debugChannel) as TextChannel).send({ embeds: [message] });
     }
@@ -176,7 +182,7 @@ export class UpdateChecker {
 
                     if (updated && _errors == 0) {
                         this._databaseHandler.updateModInCollection(mod)
-                        this.printDEBUGEMBED(this.createModEmbed(mod, updateSize))
+                        this.printDEBUGEMBED(this.createModEmbed(mod, updateSize),updateSize,mod)
                         let totalSize = await this._databaseHandler.getTotalSize();
                         if (totalSize != null) {
                             totalSize += updateSize;
