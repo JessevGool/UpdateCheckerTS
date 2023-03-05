@@ -78,6 +78,14 @@ export class UpdateChecker {
     }
     async checkforModpackUpdates() {
         let newPresets = this.getPresets(this.presetFolderPath)
+        let presetsToRemove: String[] = [];
+        this._presetList.forEach(oldPreset => {
+            if(!newPresets.some(preset => preset.fileName === oldPreset.fileName && preset.updateTime === oldPreset.updateTime))
+                {
+                    presetsToRemove.push(oldPreset.fileName)
+                    return;
+                }
+        });
         newPresets.forEach(newPreset => {
             let isInlist = false;
             this._presetList.forEach(oldPreset => {
@@ -108,7 +116,34 @@ export class UpdateChecker {
 
                 });
             }
+
         });
+        if(presetsToRemove.length > 0)
+        {
+            presetsToRemove.forEach(preset => {
+                this._presetList.forEach(oldPreset => {
+                    if(oldPreset.fileName === preset)
+                    {
+                        this._presetList = this._presetList.filter(obj => { return obj !== oldPreset });
+                        this.printDEBUG(oldPreset.fileName + " has been removed")
+                        oldPreset.modList.forEach(mod => {
+                            let isInOtherPacks = false;
+                            this._presetList.forEach(preset => {
+                                if(preset.modList.some(presetMod => presetMod === mod && presetMod !== "2558613372"))
+                                {
+                                    isInOtherPacks = true;
+                                }
+                            });
+                            if(!isInOtherPacks)
+                            {
+                                this._currentModpack = this._currentModpack.filter(obj => { return obj !== mod });
+                            }
+                        });
+                       
+                    }
+                });
+            });
+        }
         await this.compareDBModsToPresetMods();
     }
 
@@ -226,7 +261,7 @@ export class UpdateChecker {
     createModEmbed(mod: Mod, updatesize: number) {
         let packString = "";
         this._presetList.forEach(preset => {
-            if(preset.getModList().includes(mod.id.toString()))
+            if(preset.modList.includes(mod.id.toString()))
             {
                 if(packString.length > 0)
                 {
