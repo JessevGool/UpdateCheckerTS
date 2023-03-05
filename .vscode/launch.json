@@ -15,6 +15,12 @@
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ]
+        },
+        {
+            "name": "npm Debug",
+            "command": "npm run dev",
+            "request": "launch",
+            "type": "node-terminal"
         }
     ]
 }

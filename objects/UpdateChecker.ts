@@ -47,7 +47,7 @@ export class UpdateChecker {
 
 
     async printDEBUGEMBED(message: MessageEmbed, updateSize: number, mod: Mod) {
-        if(updateSize / 1000000 < 0.1 && (mod.name.toLocaleLowerCase().includes("coaltion") || mod.name.toLowerCase().includes("cco")))
+        if(updateSize / 1000000 < 0.1 && (mod.name.toLowerCase().includes("coaltion") || mod.name.toLowerCase().includes("cco")))
         {
             (this._client.channels.cache.get(this.modpackChannel) as TextChannel).send({ embeds: [message] });
             return
