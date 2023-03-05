@@ -121,10 +121,12 @@ export class UpdateChecker {
         if(presetsToRemove.length > 0)
         {
             presetsToRemove.forEach(preset => {
+                let hasBeenRemoved = false;
                 this._presetList.forEach(oldPreset => {
-                    if(oldPreset.fileName === preset)
-                    {
+                    if(oldPreset.fileName === preset && !hasBeenRemoved)
+                    {   
                         this._presetList = this._presetList.filter(obj => { return obj !== oldPreset });
+                        hasBeenRemoved = true;
                         this.printDEBUG(oldPreset.fileName + " has been removed")
                         oldPreset.modList.forEach(mod => {
                             let isInOtherPacks = false;
